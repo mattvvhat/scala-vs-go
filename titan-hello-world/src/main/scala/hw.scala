@@ -1,36 +1,47 @@
 package main
 
+import com.thinkaurelius.titan.core._
+import org.apache.commons.configuration.BaseConfiguration
+
 import com.tinkerpop.blueprints._
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph
-import com.tinkerpop.blueprints.Graph
-import com.tinkerpop.blueprints.Vertex
-import com.tinkerpop.blueprints.Edge
-import com.tinkerpop.blueprints.Direction
+import com.tinkerpop.blueprints.{Graph,Vertex,Edge,Direction}
 
-// import scala.collection.JavaConversions._
-// import scala.language.implicitConversions
-// import scala.collection.convert.WrapAsScala.enumerationAsScalaIterator
+import com.tinkerpop.rexster.client.{RexsterClientFactory,RexsterClient}
+
 import scala.collection.JavaConverters._
 
 object Hi {
+
   def main(args: Array[String]) = {
-    val g = new TinkerGraph()
 
-    val a = g.addVertex(null);
-    val b = g.addVertex(null);
-    val c = g.addVertex(null);
+    // Setup configuration
+    val conf = new BaseConfiguration()
+    conf.setProperty("storage.backend", "cassandra")
+    conf.setProperty("storage.hostname", "127.0.0.1")
+    conf.setProperty("storage.cassandra.keyspace", "dev_whatever")
 
+    // Create a titangraph
+    val x = TitanFactory.open(conf)
+
+    // Create vertices
+    val a = x.addVertex(null);
+    val b = x.addVertex(null);
+    val c = x.addVertex(null);
+
+    // Set properties
     a.setProperty("name", "Quetzalcoatl")
     b.setProperty("name", "Tlaloc")
     c.setProperty("name", "Xolotl")
 
-    val e = g.addEdge(null, a, b, "knows")
-    val f = g.addEdge(null, a, c, "knows")
+    // Create edges
+    val e = x.addEdge(null, a, b, "knows")
+    val f = x.addEdge(null, a, c, "knows")
 
+    // Query graph
     val results = a.query().labels("knows").vertices().asScala
 
-    for (result <- results) {
-      println(a.getProperty("name"), "knows", result.getProperty("name"))
-    }
+    // Close connection
+    x.shutdown
   }
 }
