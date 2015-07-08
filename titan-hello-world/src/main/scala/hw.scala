@@ -6,6 +6,7 @@ import org.apache.commons.configuration.BaseConfiguration
 import com.tinkerpop.blueprints._
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph
 import com.tinkerpop.blueprints.{Graph,Vertex,Edge,Direction}
+import com.tinkerpop.blueprints.Direction._
 
 import com.tinkerpop.rexster.client.{RexsterClientFactory,RexsterClient}
 
@@ -38,8 +39,17 @@ object Hi {
     val e = x.addEdge(null, a, b, "knows")
     val f = x.addEdge(null, a, c, "knows")
 
+    var i = 0;
+
+    for (edge <- x.getEdges().asScala) {
+      println("... " + edge.getLabel() + " " + edge.getVertex(OUT).getProperty("name"));
+      i=i+1;
+    }
+
+    println("count = " + i);
+
     // Query graph
-    val results = a.query().labels("knows").vertices().asScala
+    // val results = x.query().labels("knows").vertices().asScala
 
     // Close connection
     x.shutdown
