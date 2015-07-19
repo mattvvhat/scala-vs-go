@@ -12,6 +12,64 @@ import scala.collection.JavaConverters._
 
 object Hi {
 
+  def len(iter :Iterable[Any]): Integer = {
+    var i = 0
+    for (e <- iter) {
+      i = i+1
+    }
+    i
+  }
+
+  def clearGraph(graph :TitanGraph) {
+  }
+
+  def createVertex(graph: TitanGraph, name: String): Vertex = {
+    val v = graph.addVertex(null)
+    v.setProperty("name", name)
+    v
+  }
+
+  /**
+   * Return Vertex from Graph, and attach an unconnected vertex, if it doesn't exist
+   */
+  def getVertex(graph :TitanGraph, name :String) = {
+    val response = graph.query.has("name", name).limit(1).vertices
+    if (len(response.asScala) > 0) {
+      response.asScala.head
+    } else {
+      createVertex(graph, name)
+    }
+  }
+
+  /** Return or Create a Session Vertex **/
+  def getSessionVertex(graph :TitanGraph, id :String) = {
+    val result = graph.query.has("sessionId", id).limit(1).vertices.asScala
+    if (len(result) > 0) {
+      result.head
+    } else {
+      val v = graph.addVertex(null)
+      v.setProperty("sessionId", id)
+      graph.commit
+      v
+    }
+  }
+
+  /**
+   * Create a new Node attached to ID
+   */
+  def createVertexOn(graph: TitanGraph, name: String, id: String): Vertex = {
+    val response = graph.query.has("name", name).limit(1).vertices
+    val newVertex = graph.addVertex(null)
+    newVertex.setProperty("name", name)
+
+    val oldVertex = getSessionVertex(graph, id)
+
+    graoh.addEdge(null, oldVertex, newVertex, "sessionized")
+
+    newVertex
+  }
+
+  /** Main **/
   def main(args: Array[String]) = {
 
     // Setup configuration
@@ -22,27 +80,33 @@ object Hi {
 
     // Create a titangraph
     val x = TitanFactory.open(conf)
-    // val trans = TitanFactory.open(conf).newTransaction
 
     // Create vertices
-    val a = x.addVertex(null);
+    // val a = createVertex(x, "Xolotl")
 
-    // Set properties
-    a.setProperty("name", "Quetzalcoatl")
-    a.setProperty("n", 0)
+    val result1 = x.query.has("sessionId", "XXX3").vertices.asScala
+    println(len(result1))
+
+    getSessionVertex(x, "XXX3")
+    getSessionVertex(x, "XXX3")
+    getSessionVertex(x, "XXX3")
+
+    createVertexOn(x, "
+
+    val result2 = x.query.has("sessionId", "XXX3").vertices.asScala
+    println(len(result2))
+
 
     var i = 0;
 
-    for (v <- x.query().has("name", "Quetzalcoatl").vertices().asScala) {
+    for (v <- x.query.has("name", "Quetzalcoatl").vertices().asScala) {
       i=i+1;
-      x.addEdge(null, a, v, "is")
+      // x.addEdge(null, a, v, "is")
     }
 
     for (v <- x.query().has("name", "Quetzalcoatl").vertices.asScala) {
-      println(v.getEdges(OUT, "is").asScala)
+      // println(v.getEdges(OUT, "is").asScala)
     }
-
-    println("count = " + i);
 
     // Query graph
     // val results = x.query().labels("knows").vertices().asScala
