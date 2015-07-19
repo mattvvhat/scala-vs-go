@@ -8,8 +8,6 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph
 import com.tinkerpop.blueprints.{Graph,Vertex,Edge,Direction}
 import com.tinkerpop.blueprints.Direction._
 
-import com.tinkerpop.rexster.client.{RexsterClientFactory,RexsterClient}
-
 import scala.collection.JavaConverters._
 
 object Hi {
@@ -24,26 +22,24 @@ object Hi {
 
     // Create a titangraph
     val x = TitanFactory.open(conf)
+    // val trans = TitanFactory.open(conf).newTransaction
 
     // Create vertices
     val a = x.addVertex(null);
-    val b = x.addVertex(null);
-    val c = x.addVertex(null);
 
     // Set properties
     a.setProperty("name", "Quetzalcoatl")
-    b.setProperty("name", "Tlaloc")
-    c.setProperty("name", "Xolotl")
-
-    // Create edges
-    val e = x.addEdge(null, a, b, "knows")
-    val f = x.addEdge(null, a, c, "knows")
+    a.setProperty("n", 0)
 
     var i = 0;
 
-    for (edge <- x.getEdges().asScala) {
-      println("... " + edge.getLabel() + " " + edge.getVertex(OUT).getProperty("name"));
+    for (v <- x.query().has("name", "Quetzalcoatl").vertices().asScala) {
       i=i+1;
+      x.addEdge(null, a, v, "is")
+    }
+
+    for (v <- x.query().has("name", "Quetzalcoatl").vertices.asScala) {
+      println(v.getEdges(OUT, "is").asScala)
     }
 
     println("count = " + i);
@@ -52,6 +48,8 @@ object Hi {
     // val results = x.query().labels("knows").vertices().asScala
 
     // Close connection
+    // trans.commit
+    // trans.shutdown
     x.shutdown
   }
 }
