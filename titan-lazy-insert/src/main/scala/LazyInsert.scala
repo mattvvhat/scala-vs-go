@@ -16,16 +16,19 @@ object LazyInsert {
 
   /** Parallel Read-Write **/
   def insertUpdate() {
-    val readFuture: Future[List[Vertex]] = Future[List[Vertex]] {
-    }
-
-    val insertVertFuture: Future[List[Vertex]] = Future[List[Vertex]] {
-    }
-
     val insertEdgeFuture: Future[List[Edge]] = Future[List[Edge]] {
+
+      val readFuture: Future[List[Vertex]] = Future[List[Vertex]] {
+      }
+
+      val insertVertFuture: Future[List[Vertex]] = Future[List[Vertex]] {
+      }
+
+      // Return list
+      readFuture.await :: instertVertFuture.await :: List()
     }
 
-    null
+    insertEdgeFuture.await
   }
 
   /** Show All Vertices **/
