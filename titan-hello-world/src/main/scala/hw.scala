@@ -91,8 +91,6 @@ object Hi {
     getSessionVertex(x, "XXX3")
     getSessionVertex(x, "XXX3")
 
-    createVertexOn(x, "
-
     val result2 = x.query.has("sessionId", "XXX3").vertices.asScala
     println(len(result2))
 
